@@ -26,26 +26,3 @@
   ],
   "license": "MIT"
 }
-
-
-
-
-/*
-{
-  "name": "1sttb",
-  "version": "1.0.0",
-  "description": "My first twitter bot",
-  "main": "bot.js",
-  "scripts": {
-    "start": "node bot.js"
-  },
-  "engines": {
-    "node": "6.10.3"
-  },
-  "author": "Michael Caley",
-  "license": "ISC",
-  "dependencies": {
-    "twit": "^2.2.5"
-  }
-}
-*/
