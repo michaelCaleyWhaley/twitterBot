@@ -1,8 +1,9 @@
-// Dependencies =========================
-var  
-    twit = require('twit'),
-    config = require('./config');
 
+// Twitter bot - when a tweet is received containing the word time
+// the bot responds with the persons twitter handle and the current time
+
+var twit = require('twit');
+var config = require('./config');
 var Twitter = new twit(config);
 
 // RETWEET BOT ==========================
@@ -28,7 +29,7 @@ var retweet = function() {
                 }
                 // if there was an error while tweeting
                 if (err) {
-                	console.log(err);
+                    console.log(err);
                     console.log('Something went wrong while RETWEETING... Duplication maybe...');
                 }
             });
@@ -43,50 +44,33 @@ var retweet = function() {
 
 // grab & retweet as soon as program is running...
 retweet();  
-// retweet in every 60 minutes
+// retweet in every 24 hours
 setInterval(retweet, 86400000);
 
 
-/*
-// FAVORITE BOT====================
+//Start of time reply function
+var previousTweet = null;
 
-// find a random tweet and 'favorite' it
-var favoriteTweet = function(){  
-  var params = {
-      q: '#nodejs, #Nodejs',  // REQUIRED
-      result_type: 'recent',
-      lang: 'en'
-  }
-  // find the tweet
-  Twitter.get('search/tweets', params, function(err,data){
+var timeTweet = function() {  
+    Twitter.get('statuses/mentions_timeline', function(err, data){
+        var result = data[0];
+        var tweet = result.text;
+        var time = 'time';
 
-    // find tweets
-    var tweet = data.statuses;
-    var randomTweet = ranDom(tweet);   // pick a random tweet
-
-    // if random tweet exists
-    if(typeof randomTweet != 'undefined'){
-      // Tell TWITTER to 'favorite'
-      Twitter.post('favorites/create', {id: randomTweet.id_str}, function(err, response){
-        // if there was an error while 'favorite'
-        if(err){
-          console.log('CANNOT BE FAVORITE... Error');
+        if(tweet.indexOf(time) !== -1 && previousTweet !== result.id){
+            var currentTime = new Date().getHours() + ":" + new Date().getMinutes();
+            Twitter.post('statuses/update', {
+                in_reply_to_status_id: result.id,
+                status: '@' + result.user.screen_name + ' the time is ' + currentTime
+            });
+        } else {
+            console.log('Not asking for time');
         }
-        else{
-          console.log('FAVORITED... Success!!!');
-        }
-      });
-    }
-  });
+        previousTweet = result.id;
+    });
+
+    console.log('running');
 }
-// grab & 'favorite' as soon as program is running...
-favoriteTweet();  
-// 'favorite' a tweet in every 60 minutes
-setInterval(favoriteTweet, 3600000);
 
-// function to generate a random tweet tweet
-function ranDom (arr) {  
-  var index = Math.floor(Math.random()*arr.length);
-  return arr[index];
-};
-*/
+timeTweet();
+setInterval(timeTweet, 600000);
